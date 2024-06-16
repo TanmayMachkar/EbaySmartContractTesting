@@ -63,4 +63,25 @@ contract Ebay {
 		}
 		auction.seller.transfer(bestOffer.price); //transfer money from highest bidder to seller of item
 	}
+
+	function getAuctions() external view returns(Auction[] memory){
+		Auction[] memory _auctions = new Auction[](newAuctionId - 1);
+
+		for(uint i = 1; i < newAuctionId; i++)
+		{
+			_auctions[i-1] = auctions[i];
+		}
+		return _auctions;
+	}
+
+	function getUserAuctions(address _user) external view returns(Auction[] memory){
+		uint[] storage userAuctionIds = auctionList[_user];
+		Auction[] memory _auctions = new Auction[](userAuctionIds.length);
+		for(uint i = 0; i < userAuctionIds.length; i++)
+		{
+			uint auctionId = userAuctionIds[i];
+			_auctions[i] = auctions[auctionId];
+		}
+		return _auctions;
+	}
 }	

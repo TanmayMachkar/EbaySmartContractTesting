@@ -36,7 +36,7 @@ contract Ebay {
 		newAuctionId++;
 	}
 
-	function createOffer(uint _auctionId) external payable {
+	function createOffer(uint _auctionId) external payable auctionExists(_auctionId){
 		Auction storage auction = auctions[_auctionId];
 		Offer storage bestOffer = offers[auction.bestOfferId];
 		require(msg.value >= auction.min && msg.value > bestOffer.price, "msg.value must be greater than the minimum and the best offer");
@@ -48,7 +48,7 @@ contract Ebay {
 		newOfferId++;
 	}
 
-	function transaction(uint _auctionId) external{
+	function transaction(uint _auctionId) external auctionExists(_auctionId){
 		Auction storage auction = auctions[_auctionId];
 		Offer storage bestOffer = offers[auction.bestOfferId];
 
@@ -84,4 +84,21 @@ contract Ebay {
 		}
 		return _auctions;
 	}
-}	
+
+	function getUserOffers(address _user) external view returns(Offer[] memory){
+		uint[] storage userOfferIds = offerList[_user];
+		Offer[] memory _offers = new Offer[](userOfferIds.length);
+
+		for(uint i = 0; i<userOfferIds.length; i++)
+		{
+			uint offerId = userOfferIds[i];
+			_offers[i] = offers[offerId];
+		}
+		return _offers;
+	}
+
+	modifier auctionExists(uint _auctionId){
+		require(_auctionId > 0 && _auctionId < newAuctionId, "Auction does not exist");
+		_;
+	}
+}
